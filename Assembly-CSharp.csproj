@@ -46,11 +46,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Entity\PlayerEntity.cs" />
-     <Compile Include="Assets\GameCamera.cs" />
-     <Compile Include="Assets\Player.cs" />
-     <Compile Include="Assets\PlayerController.cs" />
-     <Compile Include="Assets\TimeManager.cs" />
+     <Compile Include="Assets\Scripts\Entity\PlayerEntity.cs" />
+     <Compile Include="Assets\Scripts\GameCamera.cs" />
+     <Compile Include="Assets\Scripts\MoonCycle.cs" />
+     <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\SunCycle.cs" />
+     <Compile Include="Assets\Scripts\TimeManager.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Program Files/Unity 5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

@@ -25,7 +25,7 @@ public class PlayerEntity : MonoBehaviour {
 			sneakiness;
 
 
-	public Image healthFillAmount, manaFillAmount, staminaFillAmount;
+	public Image healthFillAmount, manaFillAmount, staminaFillAmount, hungryFillAmount, sleepinessFillAmount;
 
 	void Start(){
 		level = 1;
@@ -34,9 +34,9 @@ public class PlayerEntity : MonoBehaviour {
 		endurance = 1;
 		sneakiness = 1;
 
-		hungerDownSpeed = 0.015f;
+		hungerDownSpeed = 0.03f;
 		hunger = 100;
-		sleepDownSpeed = 0.005f;
+		sleepDownSpeed = 0.01f;
 		sleepiness = 100;
 
 		maxHealth = 100 + level * 3 + endurance * 2;
@@ -68,6 +68,8 @@ public class PlayerEntity : MonoBehaviour {
 		healthFillAmount.fillAmount = health / maxHealth;
 		manaFillAmount.fillAmount = mana / maxMana;
 		staminaFillAmount.fillAmount = stamina / maxStamina;
+		hungryFillAmount.fillAmount = hunger / 100;
+		sleepinessFillAmount.fillAmount = sleepiness / 100;
 	}
 
 	public virtual void Eat(int mealLevel){

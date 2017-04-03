@@ -14,7 +14,9 @@ public class Player : MonoBehaviour {
 	public Text movementUi, swordUi;
 	public TimeManager timeManager;
 	PlayerEntity playerEntity;
-	public RectTransform hUi, mUi, sUi;
+	public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI;
+	public CanvasRenderer  mainInfoText, secInfoText;
+	int infoOpenAlg = 0;
 
 	void Start () {
 		playerEntity = GetComponent<PlayerEntity> ();
@@ -24,6 +26,8 @@ public class Player : MonoBehaviour {
 		isSneaking = false;
 		swordUp = false;
 		swordUi.text = "Sword Down";
+		mainInfoText.SetAlpha (0);
+		secInfoText.SetAlpha (0);
 	}
 
 	void Update () {
@@ -118,23 +122,46 @@ public class Player : MonoBehaviour {
 
 	void ShowPlayerInfoListener(){
 		float posX = hUi.localPosition.x;
-		if (Input.GetButton ("PlayerInfo")) {
-			if (posX <= 91) {
-				posX *= 1.03f;
-			} else if (posX > 91) {
-				posX = 3 + posX * 0.976f;
+		float alpha = mainInfoText.GetAlpha ();
+		float posY = playerInfoUI.localPosition.y;
+		if (Input.GetButton ("PlayerInfo") && infoOpenAlg == 0) {
+			posY += -(Mathf.Pow (posY - 30, 2) - 900) * 0.004f + 0.1f;
+			posY = Mathf.Clamp (posY, 0, 60);
+			if (posY >= 60) {
+				infoOpenAlg = 1;
 			}
-			posX = Mathf.Clamp (posX, 61, 101);
-		} else if (!Input.GetButton ("PlayerInfo")) {
-			if (posX >= 71) {
-				posX *= 0.97f;
-			} else if (posX < 71) {
-				posX = posX * 1.025f - 3;
+		} else if (!Input.GetButton ("PlayerInfo") && infoOpenAlg == 0) {
+			posY -= -(Mathf.Pow (posY -30, 2) - 900) * 0.004f + 0.1f;
+			posY = Mathf.Clamp (posY, 0, 60);
+		} else if (Input.GetButton ("PlayerInfo") && infoOpenAlg == 1) {
+			if (alpha >= 1) {
+				alpha = 1;
+			} else {
+				alpha += -(Mathf.Pow (alpha - 0.5f, 2) - 0.25f) * 0.008f + 0.1f;
 			}
+			posX += -(Mathf.Pow (posX - 81, 2) - 400) * 0.008f + 0.1f;
 			posX = Mathf.Clamp (posX, 61, 101);
-		}
+			mainInfoText.SetAlpha (alpha);
+			secInfoText.SetAlpha (alpha);
+		} else if (!Input.GetButton ("PlayerInfo") && infoOpenAlg == 1) {
+			if (alpha <= 0) {
+				alpha = 0;
+			} else {
+				alpha -= -(Mathf.Pow (alpha - 0.5f, 2) - 0.25f) * 0.008f + 0.1f;
+			}
+			posX -= -(Mathf.Pow (posX - 81, 2) - 400) * 0.008f + 0.1f;
+			posX = Mathf.Clamp (posX, 61, 101);
+			mainInfoText.SetAlpha (alpha);
+			secInfoText.SetAlpha (alpha);
+			if (posX <= 61) {
+				infoOpenAlg = 0;
+			}
+		} 
 		hUi.localPosition = new Vector3 (posX, hUi.localPosition.y, hUi.localPosition.z);
 		mUi.localPosition = new Vector3 (posX, hUi.localPosition.y, hUi.localPosition.z);
 		sUi.localPosition = new Vector3 (posX, hUi.localPosition.y, hUi.localPosition.z);
+		hngUi.localPosition = new Vector3 (posX, hUi.localPosition.y, hUi.localPosition.z);
+		slpUi.localPosition = new Vector3 (posX, hUi.localPosition.y, hUi.localPosition.z);
+		playerInfoUI.localPosition = new Vector3 (playerInfoUI.localPosition.x, posY, playerInfoUI.localPosition.z);
 	}
 }
