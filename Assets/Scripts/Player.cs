@@ -325,4 +325,10 @@ public class Player : MonoBehaviour
         slpUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
         playerInfoUI.localPosition = new Vector3(playerInfoUI.localPosition.x, posY, playerInfoUI.localPosition.z);
     }
+
+    public Vector3 playerPosition()
+    {
+        Vector3 myPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        return myPosition;
+    }
 }

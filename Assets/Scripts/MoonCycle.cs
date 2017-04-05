@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoonCycle : MonoBehaviour {
 
-	public float MoonCycleSpeed = 3;
+	public float MoonCycleSpeed = 15;
 	public Transform sunLight;
     public RectTransform moonRect;
 
