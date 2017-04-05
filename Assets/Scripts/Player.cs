@@ -8,14 +8,14 @@ public class Player : MonoBehaviour
 {
 
     Vector3 moveVelocity, direction, rollDirection, currentVelocityMod;
-    bool isRolling, isRollingDown, isSneaking, swordUp;
-    public float speed, acceleration = 5, moveSpeed = 5, sneakSpeed = 2, rotationSpeed = 1000, rollAcc;
+    bool isRolling, isRollingDown, isSneaking, swordUp, isInventory;
+    public float speed, acceleration = 5, moveSpeed = 5, sneakSpeed = 2, rotationSpeed = 1000, rollSpeed;
     PlayerController controller;
-    Quaternion targetRotation, targetRotationRoll;
+    Quaternion targetRotation, targetRotationRoll, tempTargetRotation;
     public Text movementUi, swordUi;
     public TimeManager timeManager;
     PlayerEntity playerEntity;
-    public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, sheathUI;
+    public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
     public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette;
     int infoOpenAlg = 0;
 
@@ -28,6 +28,8 @@ public class Player : MonoBehaviour
         isSneaking = false;
         swordUp = false;
         swordUi.text = "Sword Down";
+        rollSpeed = 15;
+        inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, -277, inventoryUI.localPosition.z);
         vignette.SetAlpha(0);
         mainInfoText.SetAlpha(0);
         secInfoText.SetAlpha(0);
@@ -69,6 +71,9 @@ public class Player : MonoBehaviour
         // Sword up/down Listener
         SwordUpDownListener();
 
+        // Inventory open/close Listener
+        InventoryListener();
+        
         // Rolling Listener
         RollingListener(moveInput);
 
@@ -86,33 +91,32 @@ public class Player : MonoBehaviour
             rollDirection = moveInput.normalized;
             targetRotationRoll = targetRotation;
             isRolling = true;
-            rollAcc = 1;
             movementUi.text = "Rolling";
             playerEntity.stamina -= 15;
         }
-        if (isRolling && rollAcc <= 4)
+        if (isRolling)
         {
             moveInput = Vector3.zero;
-            moveVelocity = rollAcc * speed * rollDirection;
+            moveVelocity = speed * rollDirection;
             targetRotation = targetRotationRoll;
-            rollAcc *= 1.3f;
-        }
-        else if (isRolling && rollAcc > 4)
-        {
-            isRolling = false;
-            isRollingDown = true;
-            rollAcc = 4;
-        }
-        else if (isRollingDown && rollAcc <= 4 && rollAcc >= 2)
+            speed += -(Mathf.Pow(speed - (rollSpeed + moveSpeed) / 2, 2) - 60f) * Time.deltaTime;
+            speed = Mathf.Clamp(speed, moveSpeed, rollSpeed);
+            if (speed >= rollSpeed)
+            {
+                isRolling = false;
+                isRollingDown = true;
+            }
+        } else if (isRollingDown)
         {
             moveInput = Vector3.zero;
-            moveVelocity = rollAcc * speed * rollDirection;
+            moveVelocity = speed * rollDirection;
             targetRotation = targetRotationRoll;
-            rollAcc *= 0.95f;
-        }
-        else if (isRollingDown && rollAcc < 2)
-        {
-            isRollingDown = false;
+            speed -= -(Mathf.Pow(speed - (rollSpeed + moveSpeed) / 2, 2) - 40f) * Time.deltaTime;
+            speed = Mathf.Clamp(speed, moveSpeed, rollSpeed);
+            if (speed <= moveSpeed)
+            {
+                isRollingDown = false;
+            }
         }
     }
 
@@ -142,6 +146,31 @@ public class Player : MonoBehaviour
         }
     }
 
+    void InventoryListener()
+    {
+        float inventoryY = inventoryUI.localPosition.y;
+        if (Input.GetButton("Inventory") && !isInventory)
+        {
+            tempTargetRotation = targetRotation;
+            isInventory = true;
+        }
+        else if (!Input.GetButton("Inventory") && isInventory)
+        {
+            isInventory = false;
+        }
+        if (isInventory)
+        {
+            inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
+            inventoryY = Mathf.Clamp(inventoryY, -277, -175);
+            inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+        }
+        else if (!isInventory)
+        {
+            inventoryY -= -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
+            inventoryY = Mathf.Clamp(inventoryY, -277, -175);
+            inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+        }
+    }
     void SneakingListener()
     {
         if (Input.GetButton("Sneak") && !isRolling && !isRollingDown)
