@@ -16,6 +16,7 @@ public class MoonCycle : MonoBehaviour {
         moonRect.localPosition = new Vector3(xPos / 8, transform.position.y / 15 + 40, 0);
 
         if (sunLight.position.y >= 0) {
+            if (GetComponent<Light>().shadowStrength >= 0.5 * Time.deltaTime)
 			GetComponent<Light> ().shadowStrength -= 0.5f * Time.deltaTime;
 		} else GetComponent<Light> ().shadowStrength += 0.5f * Time.deltaTime;
 		GetComponent<Light> ().shadowStrength = Mathf.Clamp (GetComponent<Light> ().shadowStrength, 0, 0.5f);
