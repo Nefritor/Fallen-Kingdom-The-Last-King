@@ -1,0 +1,18 @@
+[
+  {
+    "id": 0,
+    "title": "Бурдюк с водой",
+    "type": "drink",
+    "level": 1,
+    "description": "Кожанный бурдюк. В нем еще есть вода",
+    "slug": "leather_bottle_with_water"
+  },
+  {
+    "id": 1,
+    "title": "Сырое мясо",
+    "type": "meal",
+    "level": 1,
+    "description": "Сырое мясо какого-то зверя",
+    "slug": "raw_meat"
+  }
+]

@@ -7,9 +7,10 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
 
-    Vector3 moveVelocity, direction, rollDirection, currentVelocityMod;
+    Vector3 moveVelocity, direction, rollDirection, currentVelocityMod, mouseInput;
+    public bool isBlocked;
     bool isRolling, isRollingDown, isSneaking, swordUp, isInventory;
-    public float speed, acceleration = 5, moveSpeed = 5, sneakSpeed = 2, rotationSpeed = 1000, rollSpeed;
+    public float speed, acceleration = 5, moveSpeed = 5, sneakSpeed = 2, rotationSpeed = 1000, rollSpeed, mouseX, mouseY;
     PlayerController controller;
     Quaternion targetRotation, targetRotationRoll, tempTargetRotation;
     public Text movementUi, swordUi;
@@ -17,10 +18,16 @@ public class Player : MonoBehaviour
     PlayerEntity playerEntity;
     public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
     public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette;
-    int infoOpenAlg = 0;
+    int infoOpenAlg = 0, itemId;
+    GameObject[] invItem;
 
     void Start()
     {
+        invItem = GameObject.FindGameObjectsWithTag("invSlot");
+        mouseInput = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
+        mouseX = Input.mousePosition.x;
+        mouseY = Input.mousePosition.y;
+        //Cursor.visible = false;
         playerEntity = GetComponent<PlayerEntity>();
         controller = GetComponent<PlayerController>();
         isRolling = false;
@@ -68,12 +75,15 @@ public class Player : MonoBehaviour
         // Sneaking Listener
         SneakingListener();
 
-        // Sword up/down Listener
-        SwordUpDownListener();
+        if (!isInventory)
+        {
+            // Sword up/down Listener
+            SwordUpDownListener();
+        }
 
         // Inventory open/close Listener
         InventoryListener();
-        
+
         // Rolling Listener
         RollingListener(moveInput);
 
@@ -106,7 +116,8 @@ public class Player : MonoBehaviour
                 isRolling = false;
                 isRollingDown = true;
             }
-        } else if (isRollingDown)
+        }
+        else if (isRollingDown)
         {
             moveInput = Vector3.zero;
             moveVelocity = speed * rollDirection;
@@ -133,23 +144,34 @@ public class Player : MonoBehaviour
             swordUp = false;
             swordUi.text = "Sword Down";
         }
-        if (swordUp) {
+        if (swordUp)
+        {
+            isBlocked = true;
             swordY += -(Mathf.Pow(swordY - 50, 2) - 1600) * 0.005f + 0.05f;
             swordY = Mathf.Clamp(swordY, 10, 90);
             swordUI.localPosition = new Vector3(swordUI.localPosition.x, swordY, swordUI.localPosition.z);
+            if (swordY >= 90)
+            {
+                isBlocked = false;
+            }
         }
         else if (!swordUp)
         {
+            isBlocked = true;
             swordY -= -(Mathf.Pow(swordY - 50, 2) - 1600) * 0.005f + 0.05f;
             swordY = Mathf.Clamp(swordY, 10, 90);
             swordUI.localPosition = new Vector3(swordUI.localPosition.x, swordY, swordUI.localPosition.z);
+            if (swordY <= 10)
+            {
+                isBlocked = false;
+            }
         }
     }
 
     void InventoryListener()
     {
         float inventoryY = inventoryUI.localPosition.y;
-        if (Input.GetButton("Inventory") && !isInventory)
+        if (Input.GetButton("Inventory") && !isInventory && !isBlocked)
         {
             tempTargetRotation = targetRotation;
             isInventory = true;
@@ -171,6 +193,7 @@ public class Player : MonoBehaviour
             inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
         }
     }
+
     void SneakingListener()
     {
         if (Input.GetButton("Sneak") && !isRolling && !isRollingDown)
