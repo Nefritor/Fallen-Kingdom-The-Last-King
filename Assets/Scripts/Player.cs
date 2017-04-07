@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     public TimeManager timeManager;
     PlayerEntity playerEntity;
     public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
-    public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette;
+    public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette, vignetteBottom;
     int infoOpenAlg = 0, itemId;
     GameObject[] invItem;
 
@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
         vignette.SetAlpha(0);
         mainInfoText.SetAlpha(0);
         secInfoText.SetAlpha(0);
+        vignetteBottom.SetAlpha(0);
         hW.SetAlpha(0);
         hB.SetAlpha(0);
         mW.SetAlpha(0);
@@ -171,6 +172,7 @@ public class Player : MonoBehaviour
     void InventoryListener()
     {
         float inventoryY = inventoryUI.localPosition.y;
+        float alphaVign = vignetteBottom.GetAlpha();
         if (Input.GetButton("Inventory") && !isInventory && !isBlocked)
         {
             tempTargetRotation = targetRotation;
@@ -185,12 +187,30 @@ public class Player : MonoBehaviour
             inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
             inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+            if (alphaVign >= 1)
+            {
+                alphaVign = 1;
+            }
+            else
+            {
+                alphaVign += -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.03f + 0.02f;
+            }
+            vignetteBottom.SetAlpha(alphaVign);
         }
         else if (!isInventory)
         {
             inventoryY -= -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
             inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+            if (alphaVign <= 0)
+            {
+                alphaVign = 0;
+            }
+            else
+            {
+                alphaVign -= -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.03f + 0.02f;
+            }
+            vignetteBottom.SetAlpha(alphaVign);
         }
     }
 
