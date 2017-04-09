@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour {
+public class Inventory : MonoBehaviour
+{
 
     ItemDatabase database;
     GameObject inventoryPanel, slotSimplePanel, inventoryQuickPanel, slotQuickPanel, selectedSlot, tempSelectedSlot, inventoryInfo;
     public GameObject inventorySimpleSlot, inventorySimpleItem, inventoryQuickSlot, inventoryQuickItem;
     Text itemTitle, itemType, itemLevel, itemDescription;
 
-    int simpleSlotAmount, quickSlotAmount, idItem, tempIdItem;
+    int simpleSlotAmount, quickSlotAmount, idItem, tempIdItem, emptySlot;
+    public Player player;
     public List<Item> items = new List<Item>();
     public List<GameObject> simpleSlots = new List<GameObject>();
     public List<GameObject> quickSlots = new List<GameObject>();
-    float scale, tempScale;
-    bool isScrolling, isShowingInfo;
+    float scale, tempScale, useProccess;
+    bool isScrolling, isShowingInfo, isUsed;
 
     private void Start()
     {
@@ -50,7 +52,23 @@ public class Inventory : MonoBehaviour {
         AddItem(0);
         AddItem(0);
         slotSimplePanel.transform.GetChild(0).gameObject.transform.localScale = new Vector2(0.9f, 0.9f);
-        Debug.Log(items[0].Title);
+    }
+
+    private void Update()
+    {
+        ItemSelectingListener();
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            DropItem(0, false);
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            AddItem(0);
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            AddItem(1);
+        }
     }
 
     public void AddItem(int id)
@@ -63,7 +81,7 @@ public class Inventory : MonoBehaviour {
                 items[i] = itemToAdd;
                 GameObject itemObj = Instantiate(inventorySimpleItem);
                 itemObj.transform.SetParent(simpleSlots[i].transform);
-                itemObj.transform.position = Vector2.zero;
+                itemObj.transform.position = simpleSlots[i].transform.position;
                 itemObj.GetComponent<Image>().sprite = itemToAdd.Sprite;
                 itemObj.name = itemToAdd.Title;
                 break;
@@ -71,15 +89,42 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    private void Update()
+    public void DropItem(int invItemId, bool isItemUsed)
     {
-        ItemSelectingListener();
+        if (simpleSlots[invItemId].transform.childCount != 0)
+        {
+            items[invItemId] = new Item();
+            Destroy(simpleSlots[invItemId].transform.GetChild(0).gameObject);
+            for (int i = invItemId; i < simpleSlots.Count - 1; i++)
+            {
+                if (simpleSlots[i + 1].transform.childCount != 0)
+                {
+                    GameObject tempSlot = simpleSlots[i + 1].transform.GetChild(0).gameObject;
+                    Item tempItem = items[i + 1];
+                    items[i + 1] = new Item();
+                    items[i] = tempItem;
+                    tempSlot.transform.SetParent(simpleSlots[i].transform, false);
+                    tempSlot.transform.position = simpleSlots[i].transform.position;
+                    tempSlot.GetComponent<Image>().sprite = items[i].Sprite;
+                }
+                else break;
+            }
+        }
     }
 
     void ItemSelectingListener()
     {
         float panelX = inventoryInfo.transform.localPosition.x;
-        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0 && !isScrolling && idItem != items.Count - 1 && !isShowingInfo)
+
+        if (items[idItem].ID == -1)
+        {
+            scale = 0.7f;
+            tempScale = 0.9f;
+            tempIdItem = idItem;
+            idItem -= 1;
+            isScrolling = true;
+        }
+        if (Input.GetAxisRaw("Mouse ScrollWheel") < 0 && !isScrolling && idItem != items.Count - 1 && !isShowingInfo && player.isInventory && items[idItem + 1].ID != -1)
         {
             scale = 0.7f;
             tempScale = 0.9f;
@@ -87,7 +132,7 @@ public class Inventory : MonoBehaviour {
             idItem += 1;
             isScrolling = true;
         }
-        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0 && !isScrolling && idItem != 0 && !isShowingInfo)
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") > 0 && !isScrolling && idItem != 0 && !isShowingInfo && player.isInventory)
         {
             scale = 0.7f;
             tempScale = 0.9f;
@@ -96,7 +141,6 @@ public class Inventory : MonoBehaviour {
             isScrolling = true;
         }
 
-        Debug.Log(isShowingInfo);
         if (Input.GetButton("Sneak"))
         {
             isShowingInfo = true;
@@ -115,8 +159,37 @@ public class Inventory : MonoBehaviour {
             }
         }
 
+        // Using item
+        if (Input.GetButton("Attack") && !isScrolling && !isShowingInfo && player.isInventory)
+        {
+            useProccess += 0.5f * Time.deltaTime;
+            Debug.Log(useProccess);
+            if (useProccess >= 1)
+            {
+                useProccess = 0;
+                Use(idItem);
+                isUsed = true;
+                DropItem(idItem, isUsed);
+            }
+        }// Dropping item
+        else if (Input.GetButton("Attack") && !isScrolling && isShowingInfo && player.isInventory)
+        {
+            useProccess += 0.5f * Time.deltaTime;
+            Debug.Log(useProccess);
+            if (useProccess >= 1)
+            {
+                useProccess = 0;
+                isUsed = false;
+                DropItem(idItem, isUsed);
+            }
+        }
+        else
+        {
+            useProccess = 0;
+        }
+
         idItem = Mathf.Clamp(idItem, 0, items.Count - 1);
-        
+
         GameObject selectedSlot = slotSimplePanel.transform.GetChild(idItem).gameObject;
         GameObject tempSelectedSlot = slotSimplePanel.transform.GetChild(tempIdItem).gameObject;
 
@@ -155,8 +228,13 @@ public class Inventory : MonoBehaviour {
                     break;
             }
             itemType.text = itemTypeString;
-            itemLevel.text = "Уровень предмета: " + items[idItem].Level;
+            itemLevel.text = "Уровень предмета: " + items[idItem].ID;
             itemDescription.text = items[idItem].Description;
-         }
+        }
+    }
+
+    void Use(int itemId)
+    {
+
     }
 }

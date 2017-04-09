@@ -9,7 +9,8 @@ public class Player : MonoBehaviour
 
     Vector3 moveVelocity, direction, rollDirection, currentVelocityMod, mouseInput;
     public bool isBlocked;
-    bool isRolling, isRollingDown, isSneaking, swordUp, isInventory;
+    bool isRolling, isRollingDown, isSneaking, swordUp;
+    public bool isInventory;
     public float speed, acceleration = 5, moveSpeed = 5, sneakSpeed = 2, rotationSpeed = 1000, rollSpeed, mouseX, mouseY;
     PlayerController controller;
     Quaternion targetRotation, targetRotationRoll, tempTargetRotation;
@@ -19,11 +20,9 @@ public class Player : MonoBehaviour
     public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
     public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette, vignetteBottom;
     int infoOpenAlg = 0, itemId;
-    GameObject[] invItem;
 
     void Start()
     {
-        invItem = GameObject.FindGameObjectsWithTag("invSlot");
         mouseInput = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
         mouseX = Input.mousePosition.x;
         mouseY = Input.mousePosition.y;
@@ -367,11 +366,5 @@ public class Player : MonoBehaviour
         hngUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
         slpUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
         playerInfoUI.localPosition = new Vector3(playerInfoUI.localPosition.x, posY, playerInfoUI.localPosition.z);
-    }
-
-    public Vector3 playerPosition()
-    {
-        Vector3 myPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        return myPosition;
     }
 }
