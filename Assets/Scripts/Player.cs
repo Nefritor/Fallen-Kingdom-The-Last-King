@@ -17,12 +17,26 @@ public class Player : MonoBehaviour
     public Text movementUi, swordUi;
     public TimeManager timeManager;
     PlayerEntity playerEntity;
-    public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
-    public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette, vignetteBottom;
+    //public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
+    public RectTransform swordUI, inventoryUI;
+    public CanvasRenderer vignetteBottom;
+    //public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette, vignetteBottom;
     int infoOpenAlg = 0, itemId;
+
+    GameObject MainInfo, SecondaryInfo, health, mana, stamina, hunger, thirst, sleep;
 
     void Start()
     {
+        MainInfo = GameObject.Find("Main Info");
+        health = MainInfo.transform.FindChild("Health").gameObject;
+        mana = MainInfo.transform.FindChild("Mana").gameObject;
+        stamina = MainInfo.transform.FindChild("Stamina").gameObject;
+
+        SecondaryInfo = GameObject.Find("Secondary Info");
+        hunger = SecondaryInfo.transform.FindChild("Hunger").gameObject;
+        thirst = SecondaryInfo.transform.FindChild("Thirst").gameObject;
+        sleep = SecondaryInfo.transform.FindChild("Sleepiness").gameObject;
+
         mouseInput = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
         mouseX = Input.mousePosition.x;
         mouseY = Input.mousePosition.y;
@@ -36,7 +50,7 @@ public class Player : MonoBehaviour
         swordUi.text = "Sword Down";
         rollSpeed = 15;
         inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, -277, inventoryUI.localPosition.z);
-        vignette.SetAlpha(0);
+        /*vignette.SetAlpha(0);
         mainInfoText.SetAlpha(0);
         secInfoText.SetAlpha(0);
         vignetteBottom.SetAlpha(0);
@@ -49,7 +63,7 @@ public class Player : MonoBehaviour
         hngW.SetAlpha(0);
         hngB.SetAlpha(0);
         slpW.SetAlpha(0);
-        slpB.SetAlpha(0);
+        slpB.SetAlpha(0);*/
     }
 
     void Update()
@@ -86,10 +100,9 @@ public class Player : MonoBehaviour
 
         // Rolling Listener
         RollingListener(moveInput);
-
         // Moving Listener
         controller.Move(moveVelocity);
-
+        
         // Rotating Listener
         controller.Rotate(targetRotation, rotationSpeed);
     }
@@ -239,6 +252,14 @@ public class Player : MonoBehaviour
 
     void ShowPlayerInfoListener()
     {
+        if (Input.GetButton("PlayerInfo") && infoOpenAlg == 0)
+        {
+
+        }
+    }
+
+    /*void ShowPlayerInfoListener()
+    {
         float posX = hUi.localPosition.x;
         float alpha = mainInfoText.GetAlpha();
         float alpha1 = hW.GetAlpha();
@@ -366,5 +387,5 @@ public class Player : MonoBehaviour
         hngUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
         slpUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
         playerInfoUI.localPosition = new Vector3(playerInfoUI.localPosition.x, posY, playerInfoUI.localPosition.z);
-    }
+    }*/
 }

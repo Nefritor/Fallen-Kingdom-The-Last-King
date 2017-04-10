@@ -27,12 +27,26 @@ public class PlayerEntity : MonoBehaviour
 
     float healthTemp, manaTemp, staminaTemp, hungerTemp, sleepTemp;
 
-    public Image healthFillAmount, manaFillAmount, staminaFillAmount, hungryFillAmount, sleepinessFillAmount;
-    public Text healthW, healthB, manaW, manaB, staminaW, staminaB, hungryW, hungryB, sleepW, sleepB;
-
+    Image healthFillAmount, manaFillAmount, staminaFillAmount, hungryFillAmount, sleepinessFillAmount;
+    //public Text healthW, healthB, manaW, manaB, staminaW, staminaB, hungryW, hungryB, sleepW, sleepB;
+    Text healthText, manaText, staminaText, hungerText, thirstText, sleepText;
 
     void Start()
     {
+        healthFillAmount = GameObject.Find("Health").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+        manaFillAmount = GameObject.Find("Mana").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+        staminaFillAmount = GameObject.Find("Stamina").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+        hungryFillAmount = GameObject.Find("Hunger").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+        hungryFillAmount = GameObject.Find("Thirst").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+        sleepinessFillAmount = GameObject.Find("Sleepiness").transform.FindChild("Bar Mask").gameObject.transform.FindChild("Bar Fill").GetComponent<Image>();
+
+        healthText = GameObject.Find("Health").transform.FindChild("Text").GetComponent<Text>();
+        manaText = GameObject.Find("Mana").transform.FindChild("Text").GetComponent<Text>();
+        staminaText = GameObject.Find("Stamina").transform.FindChild("Text").GetComponent<Text>();
+        hungerText = GameObject.Find("Hunger").transform.FindChild("Text").GetComponent<Text>();
+        thirstText = GameObject.Find("Thirst").transform.FindChild("Text").GetComponent<Text>();
+        sleepText = GameObject.Find("Sleepiness").transform.FindChild("Text").GetComponent<Text>();
+
         level = 1;
         strenght = 1;
         intellect = 1;
@@ -76,24 +90,24 @@ public class PlayerEntity : MonoBehaviour
         hungryFillAmount.fillAmount = hunger / 100;
         sleepinessFillAmount.fillAmount = sleepiness / 100;
 
-        healthB.text = healthW.text;
+        /*healthB.text = healthW.text;
         manaB.text = manaW.text;
         staminaB.text = staminaW.text;
         hungryB.text = hungryW.text;
-        sleepB.text = sleepW.text;
+        sleepB.text = sleepW.text;*/
 
         ClampPlayerInfo();
 
         string accInfo = accCalc(health, healthTemp);
-        healthW.text = Mathf.Round(health) + "/" + Mathf.Round(maxHealth) + accInfo;
+        healthText.text = Mathf.Round(health) + "/" + Mathf.Round(maxHealth) + accInfo;
         accInfo = accCalc(mana, manaTemp);
-        manaW.text = Mathf.Round(mana) + "/" + Mathf.Round(maxMana) + accInfo;
+        manaText.text = Mathf.Round(mana) + "/" + Mathf.Round(maxMana) + accInfo;
         accInfo = accCalc(stamina, staminaTemp);
-        staminaW.text = Mathf.Round(stamina) + "/" + Mathf.Round(maxStamina) + accInfo;
+        staminaText.text = Mathf.Round(stamina) + "/" + Mathf.Round(maxStamina) + accInfo;
         accInfo = accCalc(hunger, hungerTemp);
-        hungryW.text = Mathf.Round(hunger) + "/100" + accInfo;
+        hungerText.text = Mathf.Round(hunger) + "/100" + accInfo;
         accInfo = accCalc(sleepiness, sleepTemp);
-        sleepW.text = Mathf.Round(sleepiness) + "/100" + accInfo;
+        sleepText.text = Mathf.Round(sleepiness) + "/100" + accInfo;
     }
 
     string accCalc(float val1, float val2)

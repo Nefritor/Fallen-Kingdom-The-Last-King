@@ -228,7 +228,7 @@ public class Inventory : MonoBehaviour
                     break;
             }
             itemType.text = itemTypeString;
-            itemLevel.text = "Уровень предмета: " + items[idItem].ID;
+            itemLevel.text = "Уровень предмета: " + items[idItem].Level;
             itemDescription.text = items[idItem].Description;
         }
     }
