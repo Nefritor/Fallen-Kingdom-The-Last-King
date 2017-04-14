@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     //public RectTransform hUi, mUi, sUi, hngUi, slpUi, playerInfoUI, swordUI, inventoryUI;
     public RectTransform swordUI, inventoryUI;
     public CanvasRenderer vignetteBottom;
+    public Inventory inventory;
     //public CanvasRenderer mainInfoText, secInfoText, hW, hB, mW, mB, sW, sB, hngW, hngB, slpW, slpB, vignette, vignetteBottom;
     int infoOpenAlg = 0, itemId;
 
@@ -79,9 +80,7 @@ public class Player : MonoBehaviour
         {
             targetRotation = Quaternion.LookRotation(moveInput);
         }
-
-        // Showing Player information Listener
-        ShowPlayerInfoListener();
+        
 
         // Showing Abilities Listener
         ShowingAbilitiesListener(moveInput);
@@ -190,13 +189,13 @@ public class Player : MonoBehaviour
             tempTargetRotation = targetRotation;
             isInventory = true;
         }
-        else if (!Input.GetButton("Inventory") && isInventory)
+        else if (!Input.GetButton("Inventory") && isInventory && !inventory.isShowingInfo)
         {
             isInventory = false;
         }
         if (isInventory)
         {
-            inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
+            inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2800) * 0.003f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
             inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
             if (alphaVign >= 1)
@@ -211,7 +210,7 @@ public class Player : MonoBehaviour
         }
         else if (!isInventory)
         {
-            inventoryY -= -(Mathf.Pow(inventoryY + 226, 2) - 2601) * 0.003f + 0.05f;
+            inventoryY -= -(Mathf.Pow(inventoryY + 226, 2) - 2800) * 0.003f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
             inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
             if (alphaVign <= 0)
@@ -248,144 +247,5 @@ public class Player : MonoBehaviour
         {
             timeManager.DoSlowMotion();
         }
-    }
-
-    void ShowPlayerInfoListener()
-    {
-        if (Input.GetButton("PlayerInfo") && infoOpenAlg == 0)
-        {
-
-        }
-    }
-
-    /*void ShowPlayerInfoListener()
-    {
-        float posX = hUi.localPosition.x;
-        float alpha = mainInfoText.GetAlpha();
-        float alpha1 = hW.GetAlpha();
-        float alphaVign = vignette.GetAlpha();
-        float posY = playerInfoUI.localPosition.y;
-        if (Input.GetButton("PlayerInfo") && infoOpenAlg == 0)
-        {
-            posY += -(Mathf.Pow(posY - 30, 2) - 900) * 0.004f + 0.1f;
-            posY = Mathf.Clamp(posY, 0, 60);
-            if (alphaVign >= 1)
-            {
-                alphaVign = 1;
-            }
-            else
-            {
-                alphaVign += -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.008f + 0.02f;
-            }
-            vignette.SetAlpha(alphaVign);
-            if (posY >= 60)
-            {
-                infoOpenAlg = 1;
-            }
-        }
-        else if (!Input.GetButton("PlayerInfo") && infoOpenAlg == 0)
-        {
-            posY -= -(Mathf.Pow(posY - 30, 2) - 900) * 0.004f + 0.1f;
-            posY = Mathf.Clamp(posY, 0, 60);
-            if (alphaVign <= 0)
-            {
-                alphaVign = 0;
-            }
-            else
-            {
-                alphaVign -= -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.008f + 0.02f;
-            }
-            vignette.SetAlpha(alphaVign);
-        }
-        else if (Input.GetButton("PlayerInfo") && infoOpenAlg == 1)
-        {
-            if (alpha >= 1)
-            {
-                alpha = 1;
-            }
-            else
-            {
-                alpha += -(Mathf.Pow(alpha - 0.5f, 2) - 0.25f) * 0.008f + 0.05f;
-            }
-            posX += -(Mathf.Pow(posX - 81, 2) - 400) * 0.008f + 0.1f;
-            posX = Mathf.Clamp(posX, 61, 101);
-            mainInfoText.SetAlpha(alpha);
-            secInfoText.SetAlpha(alpha);
-            if (posX >= 101)
-            {
-                infoOpenAlg = 2;
-            }
-        }
-        else if (!Input.GetButton("PlayerInfo") && infoOpenAlg == 1)
-        {
-            if (alpha <= 0)
-            {
-                alpha = 0;
-            }
-            else
-            {
-                alpha -= -(Mathf.Pow(alpha - 0.5f, 2) - 0.25f) * 0.008f + 0.05f;
-            }
-            posX -= -(Mathf.Pow(posX - 81, 2) - 400) * 0.008f + 0.1f;
-            posX = Mathf.Clamp(posX, 61, 101);
-            mainInfoText.SetAlpha(alpha);
-            secInfoText.SetAlpha(alpha);
-            if (posX <= 61)
-            {
-                infoOpenAlg = 0;
-            }
-        }
-        else if (Input.GetButton("PlayerInfo") && infoOpenAlg == 2)
-        {
-            if (alpha1 >= 1)
-            {
-                alpha1 = 1;
-            }
-            else
-            {
-                alpha1 += -(Mathf.Pow(alpha1 - 0.5f, 2) - 0.25f) * 0.008f + 0.05f;
-            }
-            hW.SetAlpha(alpha1);
-            hB.SetAlpha(alpha1);
-            mW.SetAlpha(alpha1);
-            mB.SetAlpha(alpha1);
-            sW.SetAlpha(alpha1);
-            sB.SetAlpha(alpha1);
-            hngW.SetAlpha(alpha1);
-            hngB.SetAlpha(alpha1);
-            slpW.SetAlpha(alpha1);
-            slpB.SetAlpha(alpha1);
-        }
-        else if (!Input.GetButton("PlayerInfo") && infoOpenAlg == 2)
-        {
-            if (alpha1 <= 0)
-            {
-                alpha1 = 0;
-            }
-            else
-            {
-                alpha1 -= -(Mathf.Pow(alpha1 - 0.5f, 2) - 0.25f) * 0.008f + 0.05f;
-            }
-            hW.SetAlpha(alpha1);
-            hB.SetAlpha(alpha1);
-            mW.SetAlpha(alpha1);
-            mB.SetAlpha(alpha1);
-            sW.SetAlpha(alpha1);
-            sB.SetAlpha(alpha1);
-            hngW.SetAlpha(alpha1);
-            hngB.SetAlpha(alpha1);
-            slpW.SetAlpha(alpha1);
-            slpB.SetAlpha(alpha1);
-            if (alpha1 <= 0)
-            {
-                infoOpenAlg = 1;
-            }
-        }
-        hUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
-        mUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
-        sUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
-        hngUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
-        slpUi.localPosition = new Vector3(posX, hUi.localPosition.y, hUi.localPosition.z);
-        playerInfoUI.localPosition = new Vector3(playerInfoUI.localPosition.x, posY, playerInfoUI.localPosition.z);
-    }*/
+    }  
 }

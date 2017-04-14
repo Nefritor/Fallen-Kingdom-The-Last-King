@@ -13,7 +13,7 @@ public class MoonCycle : MonoBehaviour {
 		transform.LookAt (Vector3.zero);
 
         float xPos = -transform.position.x + transform.position.z;
-        moonRect.localPosition = new Vector3(xPos / 8, transform.position.y / 15 + 40, 0);
+        moonRect.localPosition = new Vector3(xPos / 8, transform.position.y / 15 - 60, 0);
 
         if (sunLight.position.y >= 0) {
             if (GetComponent<Light>().shadowStrength >= 0.5 * Time.deltaTime)

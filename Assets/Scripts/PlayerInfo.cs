@@ -8,7 +8,7 @@ public class PlayerInfo : MonoBehaviour {
     RectTransform playerInfo, healthRect, manaRect, staminaRect, hungerRect, thirstRect, sleepRect;
     CanvasRenderer healthText, manaText, staminaText, hungerText, thirstText, sleepText,
         healthTextInfo, manaTextInfo, staminaTextInfo, hungerTextInfo, thirstTextInfo, sleepTextInfo,
-        healthIcon, manaIcon, staminaIcon, hungerIcon, thirstIcon, sleepIcon;
+        healthIcon, manaIcon, staminaIcon, hungerIcon, thirstIcon, sleepIcon, Vignette;
     float infoOpenAlg;
 
     void Start () {
@@ -41,6 +41,8 @@ public class PlayerInfo : MonoBehaviour {
         thirstIcon = GameObject.Find("Thirst").transform.FindChild("Icon").GetComponent<CanvasRenderer>();
         sleepIcon = GameObject.Find("Sleepiness").transform.FindChild("Icon").GetComponent<CanvasRenderer>();
 
+        Vignette = GameObject.Find("VignetteInfo").GetComponent<CanvasRenderer>();
+
         healthText.SetAlpha(0);
         manaText.SetAlpha(0);
         staminaText.SetAlpha(0);
@@ -55,11 +57,14 @@ public class PlayerInfo : MonoBehaviour {
         thirstTextInfo.SetAlpha(0);
         sleepTextInfo.SetAlpha(0);
 
+        Vignette.SetAlpha(0);
+
         infoOpenAlg = 0;
     }
 
     private void Update()
     {
+        float vignette = Vignette.GetAlpha();
         float posX = healthRect.localPosition.x;
         float alphaText = healthText.GetAlpha();
         float alphaIcon = healthIcon.GetAlpha();
@@ -68,6 +73,8 @@ public class PlayerInfo : MonoBehaviour {
         {
             posY += -(Mathf.Pow(posY + 59.5f, 2) - 2760) * 0.0025f;
             posY = Mathf.Clamp(posY, -112, -7f);
+            vignette += -(Mathf.Pow(alphaIcon - 0.5f, 2) - 0.3f) * 0.5f;
+            vignette = Mathf.Clamp(vignette, 0, 1);
             if (posY >= -8f)
             {
                 infoOpenAlg = 1;
@@ -77,6 +84,8 @@ public class PlayerInfo : MonoBehaviour {
         {
             posY -= -(Mathf.Pow(posY + 59.5f, 2) - 2760) * 0.0025f;
             posY = Mathf.Clamp(posY, -112, -7f);
+            vignette -= -(Mathf.Pow(alphaIcon - 0.5f, 2) - 0.3f) * 0.5f;
+            vignette = Mathf.Clamp(vignette, 0, 1);
         }
 
         else if (Input.GetButton("PlayerInfo") && infoOpenAlg == 1)
@@ -145,5 +154,7 @@ public class PlayerInfo : MonoBehaviour {
         hungerTextInfo.SetAlpha(alphaText);
         thirstTextInfo.SetAlpha(alphaText);
         sleepTextInfo.SetAlpha(alphaText);
+
+        Vignette.SetAlpha(vignette);
     }
 }

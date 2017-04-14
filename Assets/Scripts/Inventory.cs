@@ -17,7 +17,7 @@ public class Inventory : MonoBehaviour
     public List<GameObject> simpleSlots = new List<GameObject>();
     public List<GameObject> quickSlots = new List<GameObject>();
     float scale, tempScale, useProccess;
-    bool isScrolling, isShowingInfo, isUsed;
+    public bool isScrolling, isShowingInfo, isUsing;
 
     private void Start()
     {
@@ -29,11 +29,10 @@ public class Inventory : MonoBehaviour
         simpleSlotAmount = 10;
         quickSlotAmount = 2;
         inventoryPanel = GameObject.Find("Inventory Panel");
-        inventoryInfo = GameObject.Find("Inventory Info");
-        itemTitle = inventoryInfo.transform.FindChild("Item Title").GetComponent<Text>();
-        itemType = inventoryInfo.transform.FindChild("Item Type").GetComponent<Text>();
-        itemLevel = inventoryInfo.transform.FindChild("Item Level").GetComponent<Text>();
-        itemDescription = inventoryInfo.transform.FindChild("Item Description").GetComponent<Text>();
+        itemTitle = inventoryPanel.transform.FindChild("Item Title").GetComponent<Text>();
+        itemType = inventoryPanel.transform.FindChild("Item Type").GetComponent<Text>();
+        itemLevel = inventoryPanel.transform.FindChild("Item Level").GetComponent<Text>();
+        itemDescription = inventoryPanel.transform.FindChild("Item Description").GetComponent<Text>();
         slotSimplePanel = inventoryPanel.transform.FindChild("Simple Slots").gameObject;
         slotQuickPanel = inventoryPanel.transform.FindChild("Quick Slots").gameObject;
         for (int i = 0; i < simpleSlotAmount; i++)
@@ -114,8 +113,7 @@ public class Inventory : MonoBehaviour
 
     void ItemSelectingListener()
     {
-        float panelX = inventoryInfo.transform.localPosition.x;
-
+        float posY = inventoryPanel.transform.localPosition.y;
         if (items[idItem].ID == -1)
         {
             scale = 0.7f;
@@ -124,7 +122,7 @@ public class Inventory : MonoBehaviour
             idItem -= 1;
             isScrolling = true;
         }
-        if (Input.GetAxisRaw("Mouse ScrollWheel") < 0 && !isScrolling && idItem != items.Count - 1 && !isShowingInfo && player.isInventory && items[idItem + 1].ID != -1)
+        if (Input.GetAxisRaw("Mouse ScrollWheel") < 0 && !isScrolling && idItem != items.Count - 1 && !isShowingInfo && player.isInventory && items[idItem + 1].ID != -1 && useProccess == 0)
         {
             scale = 0.7f;
             tempScale = 0.9f;
@@ -132,7 +130,7 @@ public class Inventory : MonoBehaviour
             idItem += 1;
             isScrolling = true;
         }
-        else if (Input.GetAxisRaw("Mouse ScrollWheel") > 0 && !isScrolling && idItem != 0 && !isShowingInfo && player.isInventory)
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") > 0 && !isScrolling && idItem != 0 && !isShowingInfo && player.isInventory && useProccess == 0)
         {
             scale = 0.7f;
             tempScale = 0.9f;
@@ -141,51 +139,56 @@ public class Inventory : MonoBehaviour
             isScrolling = true;
         }
 
-        if (Input.GetButton("Sneak"))
+        // Showing Item Info
+        if (Input.GetButton("Sneak") && player.isInventory)
         {
             isShowingInfo = true;
-            panelX += -(Mathf.Pow(panelX - 152.2f, 2) - 5128f) * 0.002f;
-            panelX = Mathf.Clamp(panelX, 80.6f, 223.8f);
-            inventoryInfo.transform.localPosition = new Vector2(panelX, inventoryInfo.transform.localPosition.y);
+            posY += -(Mathf.Pow(posY, 2) - 1300) * 0.005f;
+            posY = Mathf.Clamp(posY, -33, 33);
+            inventoryPanel.transform.localPosition = new Vector2(inventoryPanel.transform.localPosition.x, posY);
         }
         else if (!Input.GetButton("Sneak"))
         {
-            panelX -= -(Mathf.Pow(panelX - 152.2f, 2) - 5128f) * 0.002f;
-            panelX = Mathf.Clamp(panelX, 80.6f, 223.8f);
-            inventoryInfo.transform.localPosition = new Vector2(panelX, inventoryInfo.transform.localPosition.y);
-            if (panelX <= 81.1f)
-            {
-                isShowingInfo = false;
-            }
+            posY -= -(Mathf.Pow(posY, 2) - 1300) * 0.005f;
+            posY = Mathf.Clamp(posY, -33, 33);
+            inventoryPanel.transform.localPosition = new Vector2(inventoryPanel.transform.localPosition.x, posY);
+            isShowingInfo = false;
         }
 
         // Using item
         if (Input.GetButton("Attack") && !isScrolling && !isShowingInfo && player.isInventory)
         {
-            useProccess += 0.5f * Time.deltaTime;
-            Debug.Log(useProccess);
+            useProccess += -(Mathf.Pow(useProccess - 1, 2) - 1.15f) * 0.02f;
+            Image im = simpleSlots[idItem].GetComponent<Image>();
+            im.fillAmount = 1 - useProccess;
             if (useProccess >= 1)
             {
                 useProccess = 0;
                 Use(idItem);
-                isUsed = true;
-                DropItem(idItem, isUsed);
+                isUsing = true;
+                DropItem(idItem, isUsing);
             }
         }// Dropping item
         else if (Input.GetButton("Attack") && !isScrolling && isShowingInfo && player.isInventory)
         {
-            useProccess += 0.5f * Time.deltaTime;
-            Debug.Log(useProccess);
+            useProccess += -(Mathf.Pow(useProccess - 1, 2) - 1.15f) * 0.02f;
+            Image im = simpleSlots[idItem].GetComponent<Image>();
+            im.fillAmount = 1 - useProccess;
+            im.color = new Color(im.color.r, 1 - Mathf.Pow(useProccess, 0.3f), 1 - Mathf.Pow(useProccess, 0.3f));
             if (useProccess >= 1)
             {
                 useProccess = 0;
-                isUsed = false;
-                DropItem(idItem, isUsed);
+                isUsing = false;
+                DropItem(idItem, isUsing);
             }
         }
         else
         {
-            useProccess = 0;
+            useProccess -= -(Mathf.Pow(useProccess - 1, 2) - 1.15f) * 0.04f;
+            useProccess = Mathf.Clamp(useProccess, 0, 1);
+            Image im = simpleSlots[idItem].GetComponent<Image>();
+            im.fillAmount = 1 - useProccess;
+            im.color = new Color(1, 1, 1);
         }
 
         idItem = Mathf.Clamp(idItem, 0, items.Count - 1);
@@ -195,11 +198,11 @@ public class Inventory : MonoBehaviour
 
         if (isScrolling)
         {
-            scale += -(Mathf.Pow(scale - 0.825f, 2) - 0.01f) * 2;
+            scale += -(Mathf.Pow(scale - 0.825f, 2) - 0.015f) * 2;
             scale = Mathf.Clamp(scale, 0.75f, 0.9f);
             selectedSlot.transform.localScale = new Vector2(scale, scale);
 
-            tempScale -= -(Mathf.Pow(tempScale - 0.825f, 2) - 0.01f) * 2;
+            tempScale -= -(Mathf.Pow(tempScale - 0.825f, 2) - 0.015f) * 2;
             tempScale = Mathf.Clamp(tempScale, 0.75f, 0.9f);
             tempSelectedSlot.transform.localScale = new Vector2(tempScale, tempScale);
             if (scale >= 0.9f && tempScale <= 0.75f)
