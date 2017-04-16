@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
         {
             targetRotation = Quaternion.LookRotation(moveInput);
         }
-        
+
 
         // Showing Abilities Listener
         ShowingAbilitiesListener(moveInput);
@@ -101,7 +101,7 @@ public class Player : MonoBehaviour
         RollingListener(moveInput);
         // Moving Listener
         controller.Move(moveVelocity);
-        
+
         // Rotating Listener
         controller.Rotate(targetRotation, rotationSpeed);
     }
@@ -184,7 +184,8 @@ public class Player : MonoBehaviour
     {
         float inventoryY = inventoryUI.localPosition.y;
         float alphaVign = vignetteBottom.GetAlpha();
-        if (Input.GetButton("Inventory") && !isInventory && !isBlocked)
+
+        if (Input.GetButton("Inventory") && !isInventory && !isBlocked && inventory.items[0].ID != -1)
         {
             tempTargetRotation = targetRotation;
             isInventory = true;
@@ -193,6 +194,17 @@ public class Player : MonoBehaviour
         {
             isInventory = false;
         }
+        else if (Input.GetButtonDown("Inventory") && !isInventory && !isBlocked && inventory.items[0].ID == -1)
+        {
+            Debug.Log("Инвентарь пуст");
+        }
+
+        if (Input.GetButton("Inventory") && isInventory && inventory.items[0].ID == -1)
+        {
+            Debug.Log("Инвентарь пуст");
+            isInventory = false;
+        }
+
         if (isInventory)
         {
             inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2800) * 0.003f;
@@ -247,5 +259,5 @@ public class Player : MonoBehaviour
         {
             timeManager.DoSlowMotion();
         }
-    }  
+    }
 }
