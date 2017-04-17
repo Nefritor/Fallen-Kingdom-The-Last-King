@@ -209,7 +209,7 @@ public class Player : MonoBehaviour
         {
             inventoryY += -(Mathf.Pow(inventoryY + 226, 2) - 2800) * 0.003f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
-            inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+            inventoryUI.localPosition = new Vector2(inventoryUI.localPosition.x, inventoryY);
             if (alphaVign >= 1)
             {
                 alphaVign = 1;
@@ -219,12 +219,13 @@ public class Player : MonoBehaviour
                 alphaVign += -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.03f + 0.02f;
             }
             vignetteBottom.SetAlpha(alphaVign);
+            inventory.quickItemInfo.transform.GetComponent<RectTransform>().localPosition = new Vector2(inventory.quickItemInfo.transform.GetComponent<RectTransform>().localPosition.x, -480 - inventoryY);
         }
         else if (!isInventory)
         {
             inventoryY -= -(Mathf.Pow(inventoryY + 226, 2) - 2800) * 0.003f;
             inventoryY = Mathf.Clamp(inventoryY, -277, -175);
-            inventoryUI.localPosition = new Vector3(inventoryUI.localPosition.x, inventoryY, inventoryUI.localPosition.z);
+            inventoryUI.localPosition = new Vector2(inventoryUI.localPosition.x, inventoryY);
             if (alphaVign <= 0)
             {
                 alphaVign = 0;
@@ -234,6 +235,7 @@ public class Player : MonoBehaviour
                 alphaVign -= -(Mathf.Pow(alphaVign - 0.5f, 2) - 0.25f) * 0.03f + 0.02f;
             }
             vignetteBottom.SetAlpha(alphaVign);
+            inventory.quickItemInfo.transform.GetComponent<RectTransform>().localPosition = new Vector2(inventory.quickItemInfo.transform.GetComponent<RectTransform>().localPosition.x, -480 - inventoryY);
         }
     }
 

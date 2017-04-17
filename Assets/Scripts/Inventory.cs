@@ -8,17 +8,18 @@ public class Inventory : MonoBehaviour
 
     ItemDatabase database;
     GameObject inventoryPanel, slotSimplePanel, inventoryQuickPanel, slotQuickPanel, selectedSlot, tempSelectedSlot, inventoryInfo;
+    public GameObject quickItemInfo;
     public GameObject inventorySimpleSlot, inventorySimpleItem, inventoryQuickSlot, inventoryQuickItem, labelQuickItem;
     Text itemTitle, itemType, itemLevel, itemDescription;
 
-    int simpleSlotAmount, quickSlotAmount, idItem, tempIdItem, emptySlot, quickEId, quickQId;
+    int simpleSlotAmount, quickSlotAmount, idItem, tempIdItem, quickEId, quickQId;
     public Player player;
     public List<Item> items = new List<Item>();
     public List<Item> quickItems = new List<Item>();
     public List<GameObject> simpleSlots = new List<GameObject>();
     public List<GameObject> quickSlots = new List<GameObject>();
-    float scale, tempScale, useProccess;
-    public bool isScrolling, isShowingInfo, isUsing, isFirstNull;
+    float scale, tempScale, useProccess, EmptyEColorProcess, EmptyQColorProcess;
+    public bool isScrolling, isShowingInfo, isUsing, isFirstNull, quickEIsEmpty, quickQIsEmpty;
 
     private void Start()
     {
@@ -32,6 +33,7 @@ public class Inventory : MonoBehaviour
         simpleSlotAmount = 10;
         quickSlotAmount = 2;
         inventoryPanel = GameObject.Find("Inventory Panel");
+        quickItemInfo = GameObject.Find("Quick Item Info");
         itemTitle = inventoryPanel.transform.FindChild("Item Title").GetComponent<Text>();
         itemType = inventoryPanel.transform.FindChild("Item Type").GetComponent<Text>();
         itemLevel = inventoryPanel.transform.FindChild("Item Level").GetComponent<Text>();
@@ -53,13 +55,13 @@ public class Inventory : MonoBehaviour
         GameObject itemObj = Instantiate(inventoryQuickItem);
         itemObj.transform.SetParent(quickSlots[0].transform);
         itemObj.transform.position = quickSlots[0].transform.position;
-        itemObj.GetComponent<Image>().sprite = new Item().Sprite;
+        itemObj.GetComponent<Image>().enabled = false;
         itemObj.name = new Item().Title;
 
         itemObj = Instantiate(inventoryQuickItem);
         itemObj.transform.SetParent(quickSlots[1].transform);
         itemObj.transform.position = quickSlots[1].transform.position;
-        itemObj.GetComponent<Image>().sprite = new Item().Sprite;
+        itemObj.GetComponent<Image>().enabled = false;
         itemObj.name = new Item().Title;
 
         itemObj = Instantiate(labelQuickItem);
@@ -71,6 +73,20 @@ public class Inventory : MonoBehaviour
         itemObj.transform.GetChild(0).GetComponent<Text>().text = "E";
         itemObj.transform.SetParent(quickSlots[1].transform);
         itemObj.transform.position = new Vector2(quickSlots[1].transform.position.x - 13, quickSlots[1].transform.position.y - 13);
+        
+        itemObj = Instantiate(slotQuickPanel.transform.GetChild(0).gameObject);
+        itemObj.transform.SetParent(quickItemInfo.transform);
+        itemObj.transform.position = quickItemInfo.transform.position;
+        itemObj.transform.GetChild(1).transform.position = new Vector2(quickItemInfo.transform.position.x - 8, quickItemInfo.transform.position.y - 8);
+        itemObj.transform.GetChild(1).transform.localScale = new Vector2(0.8f, 0.8f);
+        itemObj.transform.GetChild(0).transform.GetComponent<Image>().enabled = false;
+
+        itemObj = Instantiate(slotQuickPanel.transform.GetChild(1).gameObject);
+        itemObj.transform.SetParent(quickItemInfo.transform);
+        itemObj.transform.position = quickItemInfo.transform.position;
+        itemObj.transform.GetChild(1).transform.position = new Vector2(quickItemInfo.transform.position.x - 8, quickItemInfo.transform.position.y - 8);
+        itemObj.transform.GetChild(1).transform.localScale = new Vector2(0.8f, 0.8f);
+        itemObj.transform.GetChild(0).transform.GetComponent<Image>().enabled = false;
 
         AddItem(0);
         AddItem(1);
@@ -103,16 +119,24 @@ public class Inventory : MonoBehaviour
             if (id == quickEId)
             {
                 Debug.Log("Этот предмет уже забинден на кнопку E");
-            } else { 
-            quickQId = id;
-            quickItems[0] = items[id];
+            }
+            else
+            {
+                quickQId = id;
+                quickItems[0] = items[id];
                 if (quickSlots[0].transform.childCount != 0)
                 {
                     quickSlots[0].transform.GetChild(0).GetComponent<Image>().sprite = items[id].Sprite;
+                    quickSlots[0].transform.GetChild(0).GetComponent<Image>().enabled = true;
                     quickSlots[0].transform.GetChild(0).name = items[id].Title;
+                    quickItemInfo.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().sprite = items[id].Sprite;
+                    quickItemInfo.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().enabled = true;
+                    quickItemInfo.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().transform.localScale = new Vector2(0.8f, 0.8f);
+                    quickItemInfo.transform.GetChild(0).transform.GetChild(0).name = items[id].Title;
                 }
             }
-        } else if (key == KeyCode.E)
+        }
+        else if (key == KeyCode.E)
         {
             if (id == quickQId)
             {
@@ -125,7 +149,12 @@ public class Inventory : MonoBehaviour
                 if (quickSlots[1].transform.childCount != 0)
                 {
                     quickSlots[1].transform.GetChild(0).GetComponent<Image>().sprite = items[id].Sprite;
+                    quickSlots[1].transform.GetChild(0).GetComponent<Image>().enabled = true;
                     quickSlots[1].transform.GetChild(0).name = items[id].Title;
+                    quickItemInfo.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = items[id].Sprite;
+                    quickItemInfo.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = true;
+                    quickItemInfo.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().transform.localScale = new Vector2(0.8f, 0.8f);
+                    quickItemInfo.transform.GetChild(1).transform.GetChild(0).name = items[id].Title;
                 }
             }
         }
@@ -169,6 +198,8 @@ public class Inventory : MonoBehaviour
                 quickEId = -1;
                 quickSlots[1].transform.GetChild(0).GetComponent<Image>().sprite = new Item().Sprite;
                 quickSlots[1].transform.GetChild(0).name = new Item().Title;
+                quickItemInfo.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = false;
+                quickItemInfo.transform.GetChild(1).transform.GetChild(0).name = new Item().Title;
             }
             if (invItemId < quickQId)
             {
@@ -179,12 +210,13 @@ public class Inventory : MonoBehaviour
                 quickQId = -1;
                 quickSlots[0].transform.GetChild(0).GetComponent<Image>().sprite = new Item().Sprite;
                 quickSlots[0].transform.GetChild(0).name = new Item().Title;
+                quickItemInfo.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().enabled = false;
+                quickItemInfo.transform.GetChild(0).transform.GetChild(0).name = new Item().Title;
             }
             items[invItemId] = new Item();
             Destroy(simpleSlots[invItemId].transform.GetChild(0).gameObject);            
             for (int i = invItemId; i < simpleSlots.Count - 1; i++)
             {
-                Debug.Log(i);
                 if (simpleSlots[i + 1].transform.childCount != 0)
                 {
                     GameObject tempSlot = simpleSlots[i + 1].transform.GetChild(0).gameObject;
@@ -201,6 +233,14 @@ public class Inventory : MonoBehaviour
             {
                 tempScale = 0.9f;
                 isFirstNull = true;
+            }
+            if (items[idItem + 1].ID == -1 && idItem != 0)
+            {
+                scale = 0.7f;
+                tempScale = 0.9f;
+                tempIdItem = idItem;
+                idItem -= 1;
+                isScrolling = true;
             }
         }
     }
@@ -228,14 +268,52 @@ public class Inventory : MonoBehaviour
         // Use Quick item
         if (Input.GetKeyDown(KeyCode.E) && !player.isInventory)
         {
-            Use(quickEId);
-            isUsing = true;
-            DropItem(quickEId, isUsing);
+            try
+            { 
+                Use(quickEId);
+                isUsing = true;
+                DropItem(quickEId, isUsing);
+            }
+            catch
+            {
+                quickEIsEmpty = true;
+                EmptyEColorProcess = 1;
+            }
         } else if (Input.GetKeyDown(KeyCode.Q) && !player.isInventory)
         {
-            Use(quickQId);
-            isUsing = true;
-            DropItem(quickQId, isUsing);
+            try
+            { 
+                Use(quickQId);
+                isUsing = true;
+                DropItem(quickQId, isUsing);
+            }
+            catch
+            {
+                quickQIsEmpty = true;
+                EmptyQColorProcess = 1;
+            }
+        }
+
+        if (quickEIsEmpty)
+        {
+            Image im = quickItemInfo.transform.GetChild(1).GetComponent<Image>();
+            im.color = new Color(im.color.r, 1 - EmptyEColorProcess, 1 - EmptyEColorProcess);
+            if (EmptyEColorProcess <= 0)
+            {
+                quickEIsEmpty = false;
+            }
+            EmptyEColorProcess -= 0.02f;
+        }
+
+        if (quickQIsEmpty)
+        {
+            Image im = quickItemInfo.transform.GetChild(0).GetComponent<Image>();
+            im.color = new Color(im.color.r, 1 - EmptyQColorProcess, 1 - EmptyQColorProcess);
+            if (EmptyQColorProcess <= 0)
+            {
+                quickQIsEmpty = false;
+            }
+            EmptyQColorProcess -= 0.02f;
         }
 
         // Set Quick Item
@@ -275,14 +353,6 @@ public class Inventory : MonoBehaviour
                 Use(idItem);
                 isUsing = true;
                 DropItem(idItem, isUsing);
-                if (items[idItem + 1].ID == -1 && idItem != 0)
-                {
-                    scale = 0.7f;
-                    tempScale = 0.9f;
-                    tempIdItem = idItem;
-                    idItem -= 1;
-                    isScrolling = true;
-                }
             }
         }
         // Dropping item
@@ -297,14 +367,6 @@ public class Inventory : MonoBehaviour
                 useProccess = 0;
                 isUsing = false;
                 DropItem(idItem, isUsing);
-                if (items[idItem + 1].ID == -1 && idItem != 0)
-                {
-                    scale = 0.7f;
-                    tempScale = 0.9f;
-                    tempIdItem = idItem;
-                    idItem -= 1;
-                    isScrolling = true;
-                }
             }
         }
         else if (idItem != -1)
